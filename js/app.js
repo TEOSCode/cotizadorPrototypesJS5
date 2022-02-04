@@ -34,7 +34,7 @@ Seguro.prototype.cotizarSeguro = function () {
     Si el seguro es basico se multiplica por un 30% mas
     Si el seguro es completo se multiplica por un 50% mas
   */
-  if (this.tipo === 'basico') {
+  if (this.tipo === 'básico') {
     cantidad *= 1.3;
   } else {
     cantidad *= 1.5;
@@ -42,6 +42,43 @@ Seguro.prototype.cotizarSeguro = function () {
   return cantidad;
 };
 function UI() {}
+UI.prototype.mostrarResultado = (seguro, total) => {
+  const {marca, year, tipo} = seguro;
+  let textoMarca;
+  switch (marca) {
+    case '1':
+      textoMarca = 'Americano';
+      break;
+    case '2':
+      textoMarca = 'Asiatico';
+      break;
+    case '3':
+      textoMarca = 'Europeo';
+      break;
+    default:
+      break;
+  }
+  //crear el resultado
+  const div = document.createElement('div');
+  div.classList.add('mt-10');
+  div.innerHTML = `
+    <p class="header">Tu resumen</p>
+    <p class="font-bold">Total: $${total}</p>
+    <p class="font-bold">Marca: ${textoMarca}</p>
+    <p class="font-bold">Año: ${year}</p>
+    <p class="font-bold capitalize">Tipo: ${tipo}</p>
+ 
+  `;
+  const reusltadoDiv = document.querySelector('#resultado');
+
+  //Mostrar el Spinner
+  const spinner = document.querySelector('#cargando');
+  spinner.style.display = 'block';
+  setTimeout(() => {
+    spinner.style.display = 'none';
+    reusltadoDiv.appendChild(div);
+  }, 3000);
+};
 //llena la opciones de los años
 UI.prototype.llenarOpciones = () => {
   const max = new Date().getFullYear(),
@@ -93,8 +130,14 @@ function cotizarSeguro(e) {
     return;
   }
   ui.mostrarMensaje('Cotizando', 'exito');
+  //Ocultar cotizaciones previas
+  const resultados = document.querySelector('#resultado div');
+  if (resultados != null) {
+    resultados.remove();
+  }
   //instanciar el seguro
   const seguro = new Seguro(marca, year, tipo);
-  seguro.cotizarSeguro(marca, year, tipo);
+  const total = seguro.cotizarSeguro(marca, year, tipo);
   //utilizar el prototype que va a cotizar
+  ui.mostrarResultado(seguro, total);
 }
